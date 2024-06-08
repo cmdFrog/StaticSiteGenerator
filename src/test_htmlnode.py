@@ -21,10 +21,18 @@ class TestHTMLNode(unittest.TestCase):
 
 class TestLeafNode(unittest.TestCase):
 
-    def test_to_html_para(self):
-        para_node = LeafNode(value="This is a paragraph!", tag="p")
+    def test_to_html_tags(self):
+        para_node = LeafNode(value="This is a paragraph!", tag="p")  # p tag test
         ans = "<p>This is a paragraph!</p>"
         self.assertEqual(para_node.to_html(), ans)
+
+        ital_node = LeafNode(value="This is itallics!", tag="i")  # i tag test
+        ital_ans = "<i>This is itallics!</i>"
+        self.assertEqual(ital_node.to_html(), ital_ans)
+
+        bold_node = LeafNode(value="This is bold!", tag="b") # b tag test
+        bold_ans = "<b>This is bold!</b>"
+        self.assertEqual(bold_ans, bold_node.to_html())
 
     def test_to_html_link(self):
         link_node = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com"})

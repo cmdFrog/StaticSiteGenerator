@@ -22,7 +22,7 @@ class LeafNode(HTMLNode):
     def __init__(self, value, tag=None, props=None) -> None:
         super().__init__(tag, value, None, props)
 
-    def to_html(self) -> str:
+    def to_html(self) -> str:  # Maybe change this later to handle similar tags in one if statement with <self.tag>...</self.tag>
         html_string = ""
         if self.value == None:
             raise ValueError("Value not found")
@@ -30,11 +30,17 @@ class LeafNode(HTMLNode):
         if self.tag == None:
             return str(self.value)
         
-        if self.tag == "a":
+        if self.tag == "a":  # Links
             html_string = (f'<a{self.props_to_html()}>{self.value}</a>')
 
-        if self.tag == "p":
+        if self.tag == "p":  # Paragraphs
             html_string = (f'<p>{self.value}</p>')
+
+        if self.tag == "b":  # Bold
+            html_string = (f'<b>{self.value}</b>')
+
+        if self.tag == "i":
+            html_string = (f'<i>{self.value}</i>')
 
         
         return html_string

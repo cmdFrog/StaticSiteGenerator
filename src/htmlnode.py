@@ -25,7 +25,7 @@ class LeafNode(HTMLNode):
     def to_html(self) -> str:
         html_string = ""
         if self.value == None:
-            raise ValueError
+            raise ValueError("Value not found")
         
         if self.tag == None:
             return str(self.value)
@@ -38,3 +38,19 @@ class LeafNode(HTMLNode):
 
         
         return html_string
+    
+class ParentNode(HTMLNode):
+    def __init__(self, children, tag=None, props=None) -> None:
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        html_string = ""
+
+        if self.tag == None:
+            raise ValueError("Tag not found.")
+        
+        if self.children == None or self.children == []:
+            raise ValueError("No children found.")
+        
+        return html_string
+        

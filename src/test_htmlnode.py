@@ -8,10 +8,12 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(props={"href": "https://www.google.com", "target": "_blank"})
         ans = ' href="https://www.google.com" target="_blank"'
         self.assertEqual(ans, node.props_to_html())
+
     def test_props_to_html_2(self): # Check if given node == expected answer with more args given
         node = HTMLNode(tag="a", value="body of text", props={"href": "https://www.google.com", "target": "_blank"})
         ans = ' href="https://www.google.com" target="_blank"'
         self.assertEqual(ans, node.props_to_html())
+
     def test_props_to_html_NTarg(self): # Test hyperlink creation without target in dictionary
         node = HTMLNode(tag="a", value="body of text", props={"href": "https://www.google.com"})
         ans = ' href="https://www.google.com"'
@@ -19,8 +21,20 @@ class TestHTMLNode(unittest.TestCase):
 
 class TestLeafNode(unittest.TestCase):
 
-    def test_to_html(self):
-        pass
+    def test_to_html_para(self):
+        para_node = LeafNode(value="This is a paragraph!", tag="p")
+        ans = "<p>This is a paragraph!</p>"
+        self.assertEqual(para_node.to_html(), ans)
+
+    def test_to_html_link(self):
+        link_node = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com"})
+        ans_link = '<a href="https://www.google.com">Click me!</a>'
+        self.assertEqual(link_node.to_html(), ans_link)
+
+        link_node_target = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com", "target": "_blank"})        
+        ans_link_tar = '<a href="https://www.google.com" target="_blank">Click me!</a>'
+        self.assertEqual(link_node_target.to_html(), ans_link_tar)
+
 
 
 if __name__ == "__main__":

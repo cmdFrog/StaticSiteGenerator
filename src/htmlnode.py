@@ -20,13 +20,21 @@ class HTMLNode:
     
 class LeafNode(HTMLNode):
     def __init__(self, value, tag=None, props=None) -> None:
-        super().__init__(tag, value, props)
+        super().__init__(tag, value, None, props)
 
     def to_html(self) -> str:
         html_string = ""
         if self.value == None:
             raise ValueError
+        
         if self.tag == None:
             return str(self.value)
+        
         if self.tag == "a":
-            pass
+            html_string = (f'<a{self.props_to_html()}>{self.value}</a>')
+
+        if self.tag == "p":
+            html_string = (f'<p>{self.value}</p>')
+
+        
+        return html_string

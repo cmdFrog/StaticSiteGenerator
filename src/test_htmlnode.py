@@ -35,6 +35,15 @@ class TestLeafNode(unittest.TestCase):
         ans_link_tar = '<a href="https://www.google.com" target="_blank">Click me!</a>'
         self.assertEqual(link_node_target.to_html(), ans_link_tar)
 
+    def test_no_tag(self):
+        node = LeafNode(value="I'm a string lol")
+        ans = "I'm a string lol"
+        self.assertEqual(node.to_html(), ans)
+
+    def test_value_err(self):
+        node = LeafNode(value=None)
+        self.assertRaises(ValueError, node.to_html)
+
 
 
 if __name__ == "__main__":

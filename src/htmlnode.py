@@ -23,4 +23,10 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, props)
 
     def to_html(self) -> str:
-        pass
+        html_string = ""
+        if self.value == None:
+            raise ValueError
+        if self.tag == None:
+            return str(self.value)
+        if self.tag == "a":
+            pass

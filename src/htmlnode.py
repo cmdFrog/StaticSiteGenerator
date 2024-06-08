@@ -51,12 +51,17 @@ class ParentNode(HTMLNode):
 
     def to_html(self):
         html_string = ""
-
+        temp_string = ""
         if self.tag == None:
             raise ValueError("Tag not found.")
         
         if self.children == None or self.children == []:
             raise ValueError("No children found.")
+        
+        for i in range(0, len(self.children)):
+            temp_string = temp_string + f'{self.children[i].to_html()}'
+        
+        html_string = f'<{self.tag}>{temp_string}</{self.tag}>'
         
         return html_string
         

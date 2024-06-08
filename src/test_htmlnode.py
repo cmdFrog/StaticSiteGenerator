@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
 
@@ -51,6 +51,39 @@ class TestLeafNode(unittest.TestCase):
     def test_value_err(self):
         node = LeafNode(value=None)
         self.assertRaises(ValueError, node.to_html)
+
+class TestParent(unittest.TestCase):
+
+    def test_nested_cases(self):
+        TestParentNode = ParentNode(
+        tag="p",
+        children=[
+            LeafNode(tag="b", value="Bold text"),
+            LeafNode(tag=None, value="Normal text"),
+            ParentNode(tag="article",
+                    children=[
+                        LeafNode(tag="i", value="nested italic text"),
+                        LeafNode(tag="b", value="nested Bold text"),
+                    ]),
+            LeafNode(tag="i", value="italic text"),
+            LeafNode(tag=None, value="Normal text"),
+        ],
+    )
+        ans = "<p><b>Bold text</b>Normal text<article><i>nested italic text</i><b>nested Bold text</b></article><i>italic text</i>Normal text</p>"
+        self.assertEqual(TestParentNode.to_html(), ans)
+
+    def tests_normal_cases(self):
+        TestParentNode = ParentNode(
+        tag="p",
+        children=[
+        LeafNode(tag="b", value="Bold text"),
+        LeafNode(tag=None, value="Normal text"),
+        LeafNode(tag="i", value="italic text"),
+        LeafNode(tag=None, value="Normal text"),
+        ],
+    )
+        ans = "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>"
+        self.assertEqual(TestParentNode.to_html(), ans)
 
 
 

@@ -8,7 +8,7 @@ class HTMLNode:
     def to_html(self):    # Child classes will override this method to render themselves to HTML
         raise NotImplementedError
     
-    def props_to_html(self):    # Take props dict and construct string that represents the HTML
+    def props_to_html(self) -> str:    # Take props dict and construct string that represents the HTML
         html_string = ""
         keys = self.props.keys()
         for key in keys:
@@ -19,5 +19,8 @@ class HTMLNode:
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
     
 class LeafNode(HTMLNode):
-    def __init__(self, tag=None, value=None, children=None, props=None) -> None:
-        super().__init__(tag, value, children, props)
+    def __init__(self, value, tag=None, props=None) -> None:
+        super().__init__(tag, value, props)
+
+    def to_html(self) -> str:
+        pass

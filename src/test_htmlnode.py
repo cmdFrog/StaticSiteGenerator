@@ -39,7 +39,7 @@ class TestLeafNode(unittest.TestCase):
         ans_link = '<a href="https://www.google.com">Click me!</a>'
         self.assertEqual(link_node.to_html(), ans_link)
 
-        link_node_target = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com", "target": "_blank"})        
+        link_node_target = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com", "target": "_blank"})
         ans_link_tar = '<a href="https://www.google.com" target="_blank">Click me!</a>'
         self.assertEqual(link_node_target.to_html(), ans_link_tar)
 

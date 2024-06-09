@@ -38,20 +38,26 @@ class LeafNode(HTMLNode):
         if self.value is None:
             raise ValueError("Value not found")
 
-        if self.tag is None:
+        if self.tag is None: # Raw Text
             return str(self.value)
 
-        if self.tag == "a":  # Links
+        if self.tag == "a":    # Links
             html_string = f"<a{self.props_to_html()}>{self.value}</a>"
 
-        if self.tag == "p":  # Paragraphs
+        if self.tag == "p":    # Paragraphs
             html_string = f"<p>{self.value}</p>"
 
-        if self.tag == "b":  # Bold
+        if self.tag == "b":    # Bold
             html_string = f"<b>{self.value}</b>"
 
-        if self.tag == "i":
+        if self.tag == "i":    # Italics
             html_string = f"<i>{self.value}</i>"
+
+        if self.tag == "img":  # Image
+            html_string = f'<img{self.props_to_html()}>'
+
+        if self.tag == "code": # Code
+            html_string = f'<code>{self.value}</code>'
 
         return html_string
 

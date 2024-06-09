@@ -34,21 +34,29 @@ class TestLeafNode(unittest.TestCase):
         bold_ans = "<b>This is bold!</b>"
         self.assertEqual(bold_ans, bold_node.to_html())
 
+        img_node = LeafNode(tag="img", props={"src": "url/of/image.jpg", "alt": "Description of image"}, value="") # img tag test
+        img_ans = '<img src="url/of/image.jpg" alt="Description of image">'
+        self.assertEqual(img_node.to_html(), img_ans)
+
+        code_node = LeafNode(tag="code", value="This is code")
+        code_ans = '<code>This is code</code>'
+        self.assertEqual(code_node.to_html(), code_ans)
+
     def test_to_html_link(self):
-        link_node = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com"})
+        link_node = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com"}) # a tag test (link)
         ans_link = '<a href="https://www.google.com">Click me!</a>'
         self.assertEqual(link_node.to_html(), ans_link)
 
-        link_node_target = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com", "target": "_blank"})
+        link_node_target = LeafNode(value="Click me!", tag="a", props={"href": "https://www.google.com", "target": "_blank"}) # a tag with target prop
         ans_link_tar = '<a href="https://www.google.com" target="_blank">Click me!</a>'
         self.assertEqual(link_node_target.to_html(), ans_link_tar)
 
-    def test_no_tag(self):
+    def test_no_tag(self): # Raw Text (no tag)
         node = LeafNode(value="I'm a string lol")
         ans = "I'm a string lol"
         self.assertEqual(node.to_html(), ans)
 
-    def test_value_err(self):
+    def test_value_err(self): # LeafNode ValueError for no Value test
         node = LeafNode(value=None)
         self.assertRaises(ValueError, node.to_html)
 

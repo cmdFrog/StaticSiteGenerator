@@ -1,5 +1,5 @@
 import unittest
-from markdown import split_nodes_delimiter
+from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from textnode import ( # pylint:disable=unused-import # noqa: F401
     TextNode,
     text_type_text,
@@ -27,6 +27,12 @@ class TestMarkdown(unittest.TestCase):
 
         self.assertEqual(str(ans), str(result))
 
-
+    def test_markdown_link_img(self):
+        text_img1 = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
+        text_link1 = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+        ans_img_1 = "[('image', 'https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png'), ('another', 'https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png')]"
+        ans_link_2 = "[('link', 'https://www.example.com'), ('another', 'https://www.example.com/another')]"
+        self.assertEqual(str(extract_markdown_images(text_img1)), str(ans_img_1))
+        self.assertEqual(str(extract_markdown_links(text_link1)), str(ans_link_2))
 if __name__ == "__main__":
     unittest.main()

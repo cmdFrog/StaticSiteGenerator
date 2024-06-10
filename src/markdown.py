@@ -5,6 +5,8 @@ from textnode import (  # pylint:disable=unused-import # noqa: F401
     text_type_bold,
     text_type_italic,
     text_type_code,
+    text_type_image,
+    text_type_link
 )
 
 
@@ -68,3 +70,48 @@ def extract_markdown_links(text: str) -> tuple:
         matched_tuples.append((anchor, link))
 
     return matched_tuples
+
+def split_nodes_images(old_nodes: list) -> list:
+
+    new_node_list = []
+    for node in old_nodes:
+        if not node.text:
+            continue
+        if node.text_type != text_type_text:
+            new_node_list.append(node)
+            continue
+        if not extract_markdown_images(node.text):
+            new_node_list.append(node)
+            continue
+        #print(f"NODE: {node}")
+        matches = extract_markdown_images(node.text)
+        text = node.text
+        for image_tup in matches:
+            #print(f"IMAGE_TUP: {image_tup}")
+            split_text = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+            if split_text[0]:
+                new_node_list.append(TextNode(split_text[0], text_type_text))
+            new_node_list.append(TextNode(image_tup[0], text_type_image, image_tup[1]))
+            text = split_text[1]
+    return new_node_list
+
+def split_nodes_links(old_nodes: list) -> list:
+    new_node_list = []
+    for node in old_nodes:
+        if not node.text:
+            continue
+        if node.text_type != text_type_text:
+            new_node_list.append(node)
+            continue
+        if not extract_markdown_links(node.text):
+            new_node_list.append(node)
+            continue
+        matches = extract_markdown_links(node.text)
+        text = node.text
+        for link_tup in matches:
+            split_text = text.split(f"[{link_tup[0]}]({link_tup[1]})", 1)
+            if split_text[0]:
+                new_node_list.append(TextNode(split_text[0], text_type_text))
+            new_node_list.append(TextNode(link_tup[0], text_type_link, link_tup[1]))
+            text = split_text[1]
+    return new_node_list

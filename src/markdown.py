@@ -1,13 +1,17 @@
-from textnode import ( # pylint:disable=unused-import # noqa: F401
-        TextNode,
-        text_type_text,
-        text_type_bold,
-        text_type_italic,
-        text_type_code,)
+import re
+from textnode import (  # pylint:disable=unused-import # noqa: F401
+    TextNode,
+    text_type_text,
+    text_type_bold,
+    text_type_italic,
+    text_type_code,
+)
+
 
 def check_split_delim_error(current_string):
     if len(current_string) < 3:
         raise SyntaxError("Invalid Markdown syntax, no closing delimiter found")
+
 
 def process_delimited_text(current_strings, delimiter, text_type):
     labeled_strings = []
@@ -19,8 +23,9 @@ def process_delimited_text(current_strings, delimiter, text_type):
     labeled_strings.append([current_strings[2], "text"])
     return labeled_strings
 
+
 def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: str) -> list:
-    #text_types = {"text", "code", "italic", "bold", "link", "image"}
+    # text_types = {"text", "code", "italic", "bold", "link", "image"}
     new_node_list = []
     for node in old_nodes:
         if node.text_type != text_type_text or delimiter not in node.text:
@@ -30,11 +35,36 @@ def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: str) -> li
         current_strings = node.text.split(delimiter, 2)
         check_split_delim_error(current_strings)
 
-        labeled_strings = [[current_strings[0], "text"], [current_strings[1], text_type]]
-        labeled_strings.extend(process_delimited_text(current_strings, delimiter, text_type))
+        labeled_strings = [
+            [current_strings[0], "text"],
+            [current_strings[1], text_type],
+        ]
+        labeled_strings.extend(
+            process_delimited_text(current_strings, delimiter, text_type)
+        )
 
         for node_con in labeled_strings:
             if node_con[0]:
                 new_node_list.append(TextNode(str(node_con[0]), str(node_con[1])))
 
     return new_node_list
+
+
+def extract_markdown_images(text: str) -> tuple:
+    matched_tuples = []
+    matched_alt = re.findall(r"!\[(.*?)\]", text)
+    matched_link = re.findall(r"\((.*?)\)", text)
+    for link, alt in zip(matched_link, matched_alt):
+        matched_tuples.append((alt, link))
+
+    return matched_tuples
+
+
+def extract_markdown_links(text: str) -> tuple:
+    matched_tuples = []
+    matched_alt = re.findall(r"\[(.*?)\]", text)
+    matched_link = re.findall(r"\((.*?)\)", text)
+    for link, anchor in zip(matched_link, matched_alt):
+        matched_tuples.append((anchor, link))
+
+    return matched_tuples

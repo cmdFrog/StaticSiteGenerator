@@ -1,5 +1,7 @@
 import pprint # pylint:disable=unused-import # noqa: F401
 import re
+from htmlnode import HTMLNode, ParentNode, LeafNode
+from textnode import text_node_to_html_node
 from textnode import (  # pylint:disable=unused-import # noqa: F401
     TextNode,
     text_type_text,
@@ -8,6 +10,16 @@ from textnode import (  # pylint:disable=unused-import # noqa: F401
     text_type_code,
     text_type_image,
     text_type_link
+)
+from markdown_blocks import (
+block_type_code,
+block_type_heading,
+block_type_ordered_list,
+block_type_paragraph,
+block_type_quote,
+block_type_unordered_list,
+block_to_block_type,
+markdown_to_blocks
 )
 
 
@@ -54,21 +66,29 @@ def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: str) -> li
 
 
 def extract_markdown_images(text: str) -> tuple:
+    to_match = re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+    if not to_match:
+        return
     matched_tuples = []
-    matched_alt = re.findall(r"!\[(.*?)\]", text)
-    matched_link = re.findall(r"\((.*?)\)", text)
-    for link, alt in zip(matched_link, matched_alt):
-        matched_tuples.append((alt, link))
+    #print(to_match)
+    for txt in to_match:
+        #print(txt)
+        matched_tuples.append((txt[0], txt[1]))
+    #print(matched_tuples)
 
     return matched_tuples
 
 
 def extract_markdown_links(text: str) -> tuple:
+    to_match = re.findall(r"\[(.*?)\]\((.*?)\)", text)
+    if not to_match:
+        return
     matched_tuples = []
-    matched_alt = re.findall(r"\[(.*?)\]", text)
-    matched_link = re.findall(r"\((.*?)\)", text)
-    for link, anchor in zip(matched_link, matched_alt):
-        matched_tuples.append((anchor, link))
+    #print(to_match)
+    for txt in to_match:
+        #print(txt)
+        matched_tuples.append((txt[0], txt[1]))
+    #print(matched_tuples)
 
     return matched_tuples
 
@@ -89,9 +109,11 @@ def split_nodes_images(old_nodes: list) -> list:
         for image_tup in matches:
             #print(f"IMAGE_TUP: {image_tup}")
             split_text = text.split(f"![{image_tup[0]}]({image_tup[1]})", 1)
+            #print(split_text)
             if split_text[0]:
                 new_node_list.append(TextNode(split_text[0], text_type_text))
             new_node_list.append(TextNode(image_tup[0], text_type_image, image_tup[1]))
+            #print(split_text)
             text = split_text[1]
         if text:
             new_node_list.append(TextNode(text, text_type_text))
@@ -115,6 +137,7 @@ def split_nodes_links(old_nodes: list) -> list:
             if split_text[0]:
                 new_node_list.append(TextNode(split_text[0], text_type_text))
             new_node_list.append(TextNode(link_tup[0], text_type_link, link_tup[1]))
+            #print(split_text)
             text = split_text[1]
         if text:
             new_node_list.append(TextNode(text, text_type_text))
@@ -134,3 +157,24 @@ def text_to_textnodes(text: str) -> list:
     new_list = split_nodes_delimiter(new_list, '*', text_type_italic)
     #pprint.pp(f'SPLIT BOLD: {new_list}')
     return new_list
+
+def block_to_html_node_code(block: str, type: str) -> HTMLNode:
+    removed_marks = block.strip("\n```\n")
+    #print(text_node)
+    child_text_nodes = text_to_textnodes(removed_marks)
+    #print(child_text_nodes)
+    child_leaf_nodes = []
+    for child in child_text_nodes:
+        child_leaf_nodes.append(text_node_to_html_node(child))
+    #print(child_leaf_nodes)
+    html_node = ParentNode(tag=type, children=child_leaf_nodes)
+    return html_node
+
+#def block_to_html_node_code
+
+test_line = """```
+This [LINK](URL) and ![IMG](ALT) code
+```"""
+pprint.pp(block_to_html_node_code(test_line, block_type_code))
+
+#pprint.pp(text_to_textnodes("This [LINK](https://website.com) and ![IMG](https://imagesite.com) code"))

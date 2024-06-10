@@ -1,5 +1,5 @@
 import unittest
-from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links
+from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links, text_to_textnodes
 from textnode import ( # pylint:disable=unused-import # noqa: F401
     TextNode,
     text_type_text,
@@ -42,7 +42,7 @@ class TestMarkdown(unittest.TestCase):
                 TextNode("This node has a single ![PICTURE](https://random.link/sgsgsdfdsf.jpg) with some text and nothing else", text_type_text),
                 TextNode("AND THIS IS A RANDOM CODE NODE I GUESS", text_type_code),
             ]
-        ans = "[TextNode(image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png), TextNode( and another , text, None), TextNode(second image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png), TextNode(This is just normal text with no images., text, None), TextNode(This node has a single , text, None), TextNode(PICTURE, image, https://random.link/sgsgsdfdsf.jpg), TextNode(AND THIS IS A RANDOM CODE NODE I GUESS, code, None)]"
+        ans = "[TextNode(image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png), TextNode( and another , text, None), TextNode(second image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png), TextNode(This is just normal text with no images., text, None), TextNode(This node has a single , text, None), TextNode(PICTURE, image, https://random.link/sgsgsdfdsf.jpg), TextNode( with some text and nothing else, text, None), TextNode(AND THIS IS A RANDOM CODE NODE I GUESS, code, None)]"
 
         self.assertEqual(str(split_nodes_images(test_node_list)), str(ans))
 
@@ -54,5 +54,9 @@ class TestMarkdown(unittest.TestCase):
 
         self.assertEqual(str(split_nodes_links(test_list)), str(ans))
 
+    def test_text_to_textnodes(self):
+        test_string_1 = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+        ans = "[TextNode(This is , text, None), TextNode(text, bold, None), TextNode( with an , text, None), TextNode(italic, italic, None), TextNode( word and a , text, None), TextNode(code block, code, None), TextNode( and an , text, None), TextNode(image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png), TextNode( and a , text, None), TextNode(link, link, https://boot.dev)]"
+        self.assertEqual(str(text_to_textnodes(test_string_1)), str(ans))
 if __name__ == "__main__":
     unittest.main()

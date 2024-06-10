@@ -1,3 +1,4 @@
+import pprint # pylint:disable=unused-import # noqa: F401
 import re
 from textnode import (  # pylint:disable=unused-import # noqa: F401
     TextNode,
@@ -72,7 +73,6 @@ def extract_markdown_links(text: str) -> tuple:
     return matched_tuples
 
 def split_nodes_images(old_nodes: list) -> list:
-
     new_node_list = []
     for node in old_nodes:
         if not node.text:
@@ -93,6 +93,8 @@ def split_nodes_images(old_nodes: list) -> list:
                 new_node_list.append(TextNode(split_text[0], text_type_text))
             new_node_list.append(TextNode(image_tup[0], text_type_image, image_tup[1]))
             text = split_text[1]
+        if text:
+            new_node_list.append(TextNode(text, text_type_text))
     return new_node_list
 
 def split_nodes_links(old_nodes: list) -> list:
@@ -114,4 +116,21 @@ def split_nodes_links(old_nodes: list) -> list:
                 new_node_list.append(TextNode(split_text[0], text_type_text))
             new_node_list.append(TextNode(link_tup[0], text_type_link, link_tup[1]))
             text = split_text[1]
+        if text:
+            new_node_list.append(TextNode(text, text_type_text))
     return new_node_list
+
+def text_to_textnodes(text: str) -> list:
+    node = TextNode(text, text_type_text)
+    #print(f'ORIGINAL TEXT: {text}')
+    new_list = split_nodes_images([node])
+    #pprint.pp(f'SPLIT NODES IMAGES: {new_list}')
+    new_list = split_nodes_links(new_list)
+    #pprint.pp(f'SPLIT NODES LINKS: {new_list}')
+    new_list = split_nodes_delimiter(new_list, '`', text_type_code)
+    #pprint.pp(f'SPLIT CODE: {new_list}')
+    new_list = split_nodes_delimiter(new_list, '**', text_type_bold)
+    #pprint.pp(f'SPLIT ITALIC: {new_list}')
+    new_list = split_nodes_delimiter(new_list, '*', text_type_italic)
+    #pprint.pp(f'SPLIT BOLD: {new_list}')
+    return new_list

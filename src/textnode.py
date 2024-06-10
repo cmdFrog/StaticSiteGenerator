@@ -1,4 +1,11 @@
+from htmlnode import LeafNode
 
+text_type_text = "text"
+text_type_code = "code"
+text_type_italic = "italic"
+text_type_bold = "bold"
+text_type_link = "link"
+text_type_image = "image"
 
 class TextNode:
     def __init__(self, text: str, text_type: str, url: str=None) -> None:
@@ -13,3 +20,20 @@ class TextNode:
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
+
+def text_node_to_html_node(text_node: TextNode) -> LeafNode:
+    tag_val_nodes = {"italic": "i", "bold": "b", "code": "code"}
+
+    if text_node.text_type in tag_val_nodes:
+        return LeafNode(tag=tag_val_nodes[text_node.text_type], value=text_node.text,)
+
+    if text_node.text_type == "text":
+        return LeafNode(value=text_node.text)
+
+    if text_node.text_type == "link":
+        return LeafNode(tag="a", value=text_node.text, props={"href": text_node.url})
+
+    if text_node.text_type == "image":
+        return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text})
+
+    raise ValueError("Incompatible or no text_type in text_node_to_html_node input")

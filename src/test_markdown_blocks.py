@@ -29,3 +29,6 @@ This is code
         for test, ans in zip(test_list, ans_list):
             #print(test, ans)
             self.assertEqual(block_to_block_type(test), ans)
+
+if __name__ == "__main__":
+    unittest.main()

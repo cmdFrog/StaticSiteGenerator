@@ -59,6 +59,9 @@ class LeafNode(HTMLNode):
         if self.tag == "code": # Code
             html_string = f'<code>{self.value}</code>'
 
+        if self.tag == "list": # list
+            html_string = f'<li>{self.value}</li>'
+
         return html_string
 
 
@@ -72,7 +75,7 @@ class ParentNode(HTMLNode):
         if self.tag is None:
             raise ValueError("Tag not found.")
 
-        if self.children is None or self.children == []:
+        if not self.children:
             raise ValueError("No children found.")
 
         for child in self.children:

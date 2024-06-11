@@ -1,6 +1,6 @@
 import pprint # pylint:disable=unused-import # noqa: F401
 import re
-from htmlnode import HTMLNode, ParentNode, LeafNode
+from htmlnode import HTMLNode, ParentNode, LeafNode # pylint:disable=unused-import # noqa: F401
 from textnode import text_node_to_html_node
 from textnode import (  # pylint:disable=unused-import # noqa: F401
     TextNode,
@@ -11,7 +11,7 @@ from textnode import (  # pylint:disable=unused-import # noqa: F401
     text_type_image,
     text_type_link
 )
-from markdown_blocks import (
+from markdown_blocks import ( # pylint:disable=unused-import # noqa: F401
 block_type_code,
 block_type_heading,
 block_type_ordered_list,
@@ -158,23 +158,70 @@ def text_to_textnodes(text: str) -> list:
     #pprint.pp(f'SPLIT BOLD: {new_list}')
     return new_list
 
-def block_to_html_node_code(block: str, type: str) -> HTMLNode:
+def block_to_html_node_code(block: str, block_type: str) -> HTMLNode:
     removed_marks = block.strip("\n```\n")
-    #print(text_node)
     child_text_nodes = text_to_textnodes(removed_marks)
-    #print(child_text_nodes)
     child_leaf_nodes = []
     for child in child_text_nodes:
         child_leaf_nodes.append(text_node_to_html_node(child))
-    #print(child_leaf_nodes)
-    html_node = ParentNode(tag=type, children=child_leaf_nodes)
+    html_node = ParentNode(tag=block_type, children=child_leaf_nodes)
     return html_node
 
-#def block_to_html_node_code
+def block_to_html_node_header(block: str, block_type: str) -> HTMLNode:
+    removed_marks = block.strip("# ")
+    num_hashes = len(block) - len(removed_marks) - 1
+    child_text_nodes = text_to_textnodes(removed_marks)
+    child_leaf_nodes = []
+    for child in child_text_nodes:
+        print(child)
+        child_leaf_nodes.append(text_node_to_html_node(child))
+    html_node = ParentNode(tag=f"h{num_hashes}", children=child_leaf_nodes)
+    return html_node
 
-test_line = """```
-This [LINK](URL) and ![IMG](ALT) code
-```"""
-pprint.pp(block_to_html_node_code(test_line, block_type_code))
+def block_to_html_node_olist(block: str, block_type: str) -> HTMLNode:
+    cleaned_items = []
+    list_items = block.split("\n")
+    for item in list_items:
+        if not item:
+            continue
+        string = item[3:]
+        children = []
+        for textnode in text_to_textnodes(string):
+            html = text_node_to_html_node(textnode)
+            children.append(html)
+        cleaned_items.append(ParentNode(tag="li", children=children))
+    return ParentNode(tag="ol", children=cleaned_items)
 
-#pprint.pp(text_to_textnodes("This [LINK](https://website.com) and ![IMG](https://imagesite.com) code"))
+def block_to_html_node_ulist(block: str, block_type: str) -> HTMLNode:
+    cleaned_items = []
+    list_items = block.split("\n")
+    for item in list_items:
+        if not item:
+            continue
+        string = item[2:]
+        children = []
+        for textnode in text_to_textnodes(string):
+            html = text_node_to_html_node(textnode)
+            children.append(html)
+        cleaned_items.append(ParentNode(tag="li", children=children))
+    return ParentNode(tag="ul", children=cleaned_items)
+
+def block_to_html_para(block: str, block_type: str) -> HTMLNode:
+    split = block.split("\n")
+    text = " ".join(split)
+    children = []
+    textnodes = text_to_textnodes(text)
+    for textnode in textnodes:
+        html = text_node_to_html_node(textnode)
+        children.append(html)
+    return ParentNode(tag="p", children=children)
+
+def block_to_html_quote(block: str, block_type: str) -> HTMLNode:
+    split = block.split("\n")
+    text = " ".join(split)
+    children = []
+    textnodes = text_to_textnodes(text)
+    for textnode in textnodes:
+        html = text_node_to_html_node(textnode)
+        children.append(html)
+    return ParentNode(tag="blockquote", children=children)

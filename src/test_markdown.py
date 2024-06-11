@@ -1,5 +1,5 @@
 import unittest
-from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links, text_to_textnodes
+from markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_images, split_nodes_links, text_to_textnodes, markdown_to_html_node
 from textnode import ( # pylint:disable=unused-import # noqa: F401
     TextNode,
     text_type_text,
@@ -58,5 +58,34 @@ class TestMarkdown(unittest.TestCase):
         test_string_1 = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
         ans = "[TextNode(This is , text, None), TextNode(text, bold, None), TextNode( with an , text, None), TextNode(italic, italic, None), TextNode( word and a , text, None), TextNode(code block, code, None), TextNode( and an , text, None), TextNode(image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png), TextNode( and a , text, None), TextNode(link, link, https://boot.dev)]"
         self.assertEqual(str(text_to_textnodes(test_string_1)), str(ans))
+
+    def test_markdown_to_html(self):
+
+        markdown_doc = """# Header 1
+
+## Header 2
+
+This is a paragraph with some **BOLD** and *ITALIC* in it.
+
+> Quote from Obama
+
+```
+CHECK OUT MY COOL CODE! IT HAS AN IMAGE IN IT ![alt text for image](url/of/image.jpg)
+```
+
+1. I like cheese
+2. you like cheese
+3. we like cheese
+4. uhh cheese
+
+* this is a list
+* still a list
+"""
+        ans = """<div><h1>Header 1</h1><h2>Header 2</h2><p>This is a paragraph with some <b>BOLD</b> and <i>ITALIC</i> in it.</p><blockquote>> Quote from Obama</blockquote><code>CHECK OUT MY COOL CODE! IT HAS AN IMAGE IN IT <img src="url/of/image.jpg" alt="alt text for image"></code><ol><li>I like cheese</li><li>you like cheese</li><li>we like cheese</li><li>uhh cheese</li></ol><ul><li>this is a list</li><li>still a list</li></ul></div>"""
+        nodes = markdown_to_html_node(markdown_doc)
+        self.assertEqual(str(nodes.to_html()), str(ans))
+
+
+
 if __name__ == "__main__":
     unittest.main()

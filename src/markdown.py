@@ -245,38 +245,3 @@ def markdown_to_html_node(markdown):
         HTML_list.append(func(block))
     #print(f'HTML_LIST: {HTML_list}')
     return ParentNode(children=HTML_list, tag="div")
-
-
-
-markdown_doc = """# Header 1
-
-## Header 2
-
-This is a paragraph with some **BOLD** and *ITALIC* in it.
-
-> Quote from Obama
-
-```
-CHECK OUT MY COOL CODE! IT HAS AN IMAGE IN IT ![alt text for image](url/of/image.jpg)
-```
-
-1. I like cheese
-2. you like cheese
-3. we like cheese
-4. uhh cheese
-
-* this is a list
-* still a list
-"""
-
-nodee = (markdown_to_html_node(markdown_doc))
-print(nodee.to_html())
-markdown_input = """
-* this is a list
-* still a list
-"""
-
-#html_node = markdown_to_html_node(markdown_input)
-#html_output = html_node.to_html()
-#print(f"HTML Output:\n{html_output}")
-

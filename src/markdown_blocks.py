@@ -31,10 +31,7 @@ def block_to_block_type(block: str) -> str:
             if not line.startswith(">"):
                 return block_type_paragraph
         return block_type_quote
-    if block.startswith("* "):
-        for line in split:
-            if not line.startswith("* "):
-                return block_type_paragraph
+    if any(line.strip().startswith("* ") or line.strip().startswith("- ") for line in split):
         return block_type_unordered_list
     if block.startswith("- "):
         for line in split:

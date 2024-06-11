@@ -158,27 +158,26 @@ def text_to_textnodes(text: str) -> list:
     #pprint.pp(f'SPLIT BOLD: {new_list}')
     return new_list
 
-def block_to_html_node_code(block: str, block_type: str) -> HTMLNode:
+def block_to_html_node_code(block: str) -> HTMLNode:
     removed_marks = block.strip("\n```\n")
     child_text_nodes = text_to_textnodes(removed_marks)
     child_leaf_nodes = []
     for child in child_text_nodes:
         child_leaf_nodes.append(text_node_to_html_node(child))
-    html_node = ParentNode(tag=block_type, children=child_leaf_nodes)
+    html_node = ParentNode(tag="code", children=child_leaf_nodes)
     return html_node
 
-def block_to_html_node_header(block: str, block_type: str) -> HTMLNode:
+def block_to_html_node_header(block: str) -> HTMLNode:
     removed_marks = block.strip("# ")
     num_hashes = len(block) - len(removed_marks) - 1
     child_text_nodes = text_to_textnodes(removed_marks)
     child_leaf_nodes = []
     for child in child_text_nodes:
-        print(child)
         child_leaf_nodes.append(text_node_to_html_node(child))
     html_node = ParentNode(tag=f"h{num_hashes}", children=child_leaf_nodes)
     return html_node
 
-def block_to_html_node_olist(block: str, block_type: str) -> HTMLNode:
+def block_to_html_node_olist(block: str) -> HTMLNode:
     cleaned_items = []
     list_items = block.split("\n")
     for item in list_items:
@@ -192,7 +191,7 @@ def block_to_html_node_olist(block: str, block_type: str) -> HTMLNode:
         cleaned_items.append(ParentNode(tag="li", children=children))
     return ParentNode(tag="ol", children=cleaned_items)
 
-def block_to_html_node_ulist(block: str, block_type: str) -> HTMLNode:
+def block_to_html_node_ulist(block: str) -> HTMLNode:
     cleaned_items = []
     list_items = block.split("\n")
     for item in list_items:
@@ -206,7 +205,7 @@ def block_to_html_node_ulist(block: str, block_type: str) -> HTMLNode:
         cleaned_items.append(ParentNode(tag="li", children=children))
     return ParentNode(tag="ul", children=cleaned_items)
 
-def block_to_html_para(block: str, block_type: str) -> HTMLNode:
+def block_to_html_para(block: str) -> HTMLNode:
     split = block.split("\n")
     text = " ".join(split)
     children = []
@@ -216,7 +215,7 @@ def block_to_html_para(block: str, block_type: str) -> HTMLNode:
         children.append(html)
     return ParentNode(tag="p", children=children)
 
-def block_to_html_quote(block: str, block_type: str) -> HTMLNode:
+def block_to_html_quote(block: str) -> HTMLNode:
     split = block.split("\n")
     text = " ".join(split)
     children = []
@@ -225,3 +224,59 @@ def block_to_html_quote(block: str, block_type: str) -> HTMLNode:
         html = text_node_to_html_node(textnode)
         children.append(html)
     return ParentNode(tag="blockquote", children=children)
+
+def markdown_to_html_node(markdown):
+    block_type_dict = {
+                        block_type_heading: block_to_html_node_header,
+                        block_type_code: block_to_html_node_code,
+                        block_type_paragraph: block_to_html_para,
+                        block_type_quote: block_to_html_quote,
+                        block_type_ordered_list: block_to_html_node_olist,
+                        block_type_unordered_list: block_to_html_node_ulist
+                        }
+    blocks = markdown_to_blocks(markdown)
+    HTML_list = []
+    for block in blocks:
+        #print(f'EACH BLOCK: {block}')
+        block_type = block_to_block_type(block)
+        #print(f'BLOCK TYPE: {block_type}')
+        func = block_type_dict[block_type]
+        #print(f'APPENDED: {func(block)}')
+        HTML_list.append(func(block))
+    #print(f'HTML_LIST: {HTML_list}')
+    return ParentNode(children=HTML_list, tag="div")
+
+
+
+markdown_doc = """# Header 1
+
+## Header 2
+
+This is a paragraph with some **BOLD** and *ITALIC* in it.
+
+> Quote from Obama
+
+```
+CHECK OUT MY COOL CODE! IT HAS AN IMAGE IN IT ![alt text for image](url/of/image.jpg)
+```
+
+1. I like cheese
+2. you like cheese
+3. we like cheese
+4. uhh cheese
+
+* this is a list
+* still a list
+"""
+
+nodee = (markdown_to_html_node(markdown_doc))
+print(nodee.to_html())
+markdown_input = """
+* this is a list
+* still a list
+"""
+
+#html_node = markdown_to_html_node(markdown_input)
+#html_output = html_node.to_html()
+#print(f"HTML Output:\n{html_output}")
+

@@ -1,6 +1,6 @@
 import os
 import shutil
-from markdown import markdown_to_blocks
+from markdown import markdown_to_blocks, markdown_to_html_node
 
 def copy_contents_to(from_path, to_path):
     if os.listdir(to_path):
@@ -23,25 +23,43 @@ def extract_title(markdown: str) -> str:
 
     raise ValueError("No header found")
 
-markdown_doc = """# Header 1
+def read_file(path):
+    file = open(path, encoding="utf-8")
+    try:
+        file_contents = file.read()
+    except Exception as e:
+        raise ValueError(f"Failed to read the file {e}") from e
+    finally:
+        file.close()
+    return file_contents
 
-## Header 2
+def relative_to_absolute(relative_path):
+    if os.path.isabs(relative_path):
+        return relative_path
+    if "SSG" in relative_path.split(os.path.sep):
+        raise SyntaxError("If given path is relative, it must be relative to inside the SSG directory. ie: content/index.md and not SSG/content/index.md")
+    src_directory = os.path.dirname(os.path.realpath(__file__))
+    ssg_directory = os.path.abspath(os.path.join(src_directory, ".."))
+    return os.path.join(ssg_directory, relative_path)
 
-This is a paragraph with some **BOLD** and *ITALIC* in it.
 
-> Quote from Obama
 
-```
-CHECK OUT MY COOL CODE! IT HAS AN IMAGE IN IT ![alt text for image](url/of/image.jpg)
-```
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    from_path = relative_to_absolute(from_path)
+    template_path = relative_to_absolute(template_path)
+    dest_path = relative_to_absolute(dest_path)
+    markdown_file = read_file(from_path)
+    html_template = read_file(template_path)
+    html_node = markdown_to_html_node(markdown_file)
+    html_cont = html_node.to_html()
+    title = extract_title(markdown_file)
+    content_replace = html_template.replace("{{ Content }}", html_cont)
+    final_html = content_replace.replace("{{ Title }}", title)
+    dest_dir = os.path.dirname(dest_path)
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+    with open(dest_path, "w", encoding="utf-8") as file:
+        file.write(final_html)
 
-1. I like cheese
-2. you like cheese
-3. we like cheese
-4. uhh cheese
-
-* this is a list
-* still a list
-"""
-
-print(extract_title(markdown_doc))
+#generate_page("/home/cmdfrog/workspace/github.com/cmdFrog/SSG/content/index.md", "/home/cmdfrog/workspace/github.com/cmdFrog/SSG/template.html", "/home/cmdfrog/workspace/github.com/cmdFrog/SSG/public/index.html")
